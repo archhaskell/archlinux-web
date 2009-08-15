@@ -3,7 +3,7 @@ agda-executable
 armada
 arrowp
 augur
-autoproc
+haskell-autoproc
 backdropper
 bacteria
 baskell
