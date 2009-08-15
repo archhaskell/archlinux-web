@@ -498,7 +498,7 @@ haskell-hjavascript
 haskell-hjs
 haskell-hjscript
 haskell-hledger
-haskell-hev
+haskell-hlibev
 haskell-hlist
 haskell-hlongurl
 haskell-hmarkup
@@ -1105,7 +1105,6 @@ haskell-xattr
 haskell-xauth
 haskell-xcb-types
 haskell-xformat
-haskell-xft
 haskell-xhb
 haskell-xhtml
 haskell-xml
