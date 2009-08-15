@@ -9,7 +9,9 @@
 module Distribution.ArchLinux.AUR (
         AURInfo(..),
         info,
-        search
+        search,
+        package
+
     ) where
 
 {-
@@ -37,6 +39,11 @@ import Text.PrettyPrint
 import Text.PrettyPrint.HughesPJClass
 import qualified Data.Map as M
 import Control.Monad
+import System.FilePath
+import Data.List
+import Data.Char
+
+import Distribution.ArchLinux.PkgBuild
 
 ------------------------------------------------------------------------
 
@@ -68,6 +75,63 @@ search m = do
         Right a -> flatten a
 
 ------------------------------------------------------------------------
+--
+-- TODO: programmatically list all packages by arch-haskell
+-- generate table of versions.
+-- colour out of date things.
+--
+
+-- | Return the parsed PKGBUILD
+-- pkgbuild :: String -> IO (Either String [String]) -- (Either String PkgBuild)
+
+package :: String -> IO (Either String AURInfo, Either String AnnotatedPkgBuild)
+package m = do
+    v <- info m
+    case v of
+        Left s  -> return $ (Left s, Left "No PKGBUILD found")
+        Right p -> do
+            let name   = packageName p
+                aurUrl = "http://aur.archlinux.org/packages" </> name </> name </> "PKGBUILD"
+
+            rsp <- simpleHTTP (getRequest aurUrl)
+            case rsp of
+                 Left err -> return $ (Right p, Left (show err))
+                 Right _  -> do
+                    pkg <- getResponseBody rsp -- TODO 404
+                    case decodePackage pkg of
+                         Left e ->  return (Right p, Left e)
+                         Right k -> return (Right p, Right k)
+
+------------------------------------------------------------------------
+--
+-- TODO:
+-- generate report on packages. groupBy
+--
+
+-- | List packages not built with up to date version of cabal2arch
+{-
+lint_cabal2arch = do
+    aurs <- search "haskell"
+    forM_ aurs $ \aur -> do
+        let n = packageName aur
+        k <- pkgbuild n
+        case k of
+             Left _ -> putStrLn $ "No pkgbuild for" ++ packageName aur
+             Right p -> do
+
+                case cabal2arch_version p of
+                     v | v == simpleParse "0.6"
+                             -> putStrLn $ "GOOD " ++ packageName aur 
+
+                     v       -> do putStrLn $ "Missing cabal2arch version for: " ++ packageName aur ++ " " ++ show v
+                                   putStrLn $ "http://aur.archlinux.org/packages.php?ID=" ++ show ( packageID aur)
+                                   putStrLn ""
+-}
+
+------------------------------------------------------------------------
+--
+-- TODO: from the packagename, construct the url to the AUR page.
+--
 
 -- | URL for AUR RPC server
 url :: Doc
@@ -120,6 +184,7 @@ p <?> q = p <> char '?' <> q
 data AURInfo
     = AURInfo {
          packageID        :: Integer                        -- ^ unique ID of the package on AUR
+        ,packageURLinAUR  :: String                         -- ^ url of AUR package
         ,packageName      :: String                         -- ^ string name of package
         ,packageVersion   :: Either String (Version,String) -- ^ either the AUR version (version,rev)  or a string
         ,packageCategory  :: Integer                        -- ^ numeric category of the package (e.g. 17 == System)
@@ -197,8 +262,11 @@ parseInfo info_obj = do
                                         Just v  -> Right (v, tail xs)
                 | otherwise         = Left vers__
 
+        id_ident = read (fromJSString id_)
+
     return $ AURInfo {
-                packageID          = read (fromJSString id_)
+                packageID          = id_ident
+               ,packageURLinAUR    = "http://aur.archlinux.org/packages.php?ID=" ++ show id_ident
                ,packageName        = fromJSString name_
                ,packageVersion     = version
                ,packageCategory    = read (fromJSString cat_)
