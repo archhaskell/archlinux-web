@@ -34,6 +34,7 @@ import Text.Printf
 import Control.Parallel.Strategies
 
 import Distribution.Version
+import qualified Data.Map as M
 
 instance NFData (IO a) where rnf x = ()
 
@@ -79,11 +80,15 @@ parM tests f = do
 --
 report :: [String] -> IO String
 report xs = do
+    -- load current index.
+    putStr "Loading package index ... " >> hFlush stdout
+    index <- loadPackageIndex
+    putStrLn "Done."
+
     -- collect sets of results
     res_ <- parM (nub xs) $ \p -> do
         handle (\s -> return (p, Nothing, (Left (show s), Left []))) $ do
             k <- package p
-            k `seq` return ()
 
             -- if there is a hackage path, lookup version.
             --  cabal info xmonad -v0
@@ -91,25 +96,14 @@ report xs = do
 
                  (Right aur, _) | not (null (packageURL aur))  -> do
                      let name = takeFileName (packageURL aur) -- haskell package name
-                     v <- myReadProcess "cabal" ["info","-v0",name] []
-                     return $! case v of
-                          Left _  -> Nothing
-                          Right s -> let v = reverse
-                                          . takeWhile (not . isSpace )
-                                          . reverse
-                                          . (\k -> case find ("Latest version available" `isInfixOf`) k of
-                                                 Nothing -> []
-                                                 Just n  -> n )
-                                          $ lines s
-
-                                     in simpleParse v
+                     return $! M.lookup name index
                  _ -> return Nothing
 
-            return (p, vers, k)
+            vers `seq` k `seq` return $! (p, vers, k)
 
     time <- getClockTime
 
-    let results = sortBy (\(n,x,_) (m,y,_) -> x `seq` y `seq` n `compare` m) res_
+    let results = sortBy (\(n,x,_) (m,y,_) -> n `compare` m) res_
 
     return. showHtml $
         (header $
@@ -253,7 +247,6 @@ scores  x = thediv x ! [identifier "Scores" ]
 
 
 ------------------------------------------------------------------------
-
 --
 -- Strict process reading
 --
@@ -288,4 +281,30 @@ myReadProcess cmd args input = C.handle (return . handler) $ do
   where
     handler (C.ExitException e) = Left (e,"","")
     handler e                   = Left (ExitFailure 1, show e, "")
+
+------------------------------------------------------------------------
+--
+-- Load a table of packages and their latest versions
+--
+loadPackageIndex :: IO (M.Map String Version)
+loadPackageIndex = do
+    v <- myReadProcess "cabal" ["list", "--simple-output"] []
+    case v of
+         Left err   -> error (show err)
+         Right idx  -> do
+
+            let table :: M.Map String Version
+                table = M.fromList  -- last value is used. cabal prints in version order.
+                     [  (name, vers)
+                     |  pkg <- lines idx
+                     ,  let (name, _:vers_) = break isSpace pkg
+                     ,  let vers = fromJust (simpleParse vers_)
+                     ]
+
+            return $! table
+
+            -- Data.Map String Version
+            --
+
+
 
