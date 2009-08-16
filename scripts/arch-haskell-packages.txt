@@ -154,7 +154,7 @@ haskell-boxes
 haskell-bsd-sysctl
 haskell-buster
 haskell-buster-gtk
-haskell-buster
+haskell-buster-network
 haskell-byteorder
 haskell-bytestring
 haskell-bytestring-class
@@ -404,6 +404,7 @@ haskell-gtk2hs-rpn
 haskell-gtk2hsgenerics
 haskell-hack
 haskell-hack-contrib
+haskell-hack-contrib-press
 haskell-hack-frontend-happstack
 haskell-hack-frontend-monadcgi
 haskell-hack-handler-cgi
@@ -1289,3 +1290,9 @@ yst
 haskell-binpack
 haskell-pop3-client
 haskell-xdg-basedir
+haskell-io-storage
+breakout
+haskell-network-fancy
+haskell-enummap
+haskell-cabal-query
+haskell-pubsub
