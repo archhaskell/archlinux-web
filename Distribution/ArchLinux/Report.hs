@@ -117,13 +117,16 @@ report xs = do
                           , td  $
 
                               case vers of
+                                   Nothing | packageLocation aur == 3 -> toHtml ""
                                    Nothing -> bad (toHtml "-")
                                    Just v  -> case packageVersion aur of
                                      Left s  -> toHtml (display v)
                                      Right (v',_) | v == v' -> toHtml (display v)
                                                  | otherwise -> bad (toHtml (display v))
 
-                          , td $ bad (toHtml "PKGBUILD not found")
+                          , td $ if packageLocation aur /= 3
+                                    then bad (toHtml "PKGBUILD not found")
+                                    else toHtml ""
 
                           , td  $ if packageVotes aur > 10
                                      then good $ toHtml $ show $ packageVotes aur
@@ -152,6 +155,7 @@ report xs = do
 
                           , td  $
                               case vers of
+                                   Nothing | packageLocation aur == 3 -> toHtml ""
                                    Nothing -> bad (toHtml "-")
                                    Just v  -> case packageVersion aur of
                                      Left s  -> toHtml (display v)
