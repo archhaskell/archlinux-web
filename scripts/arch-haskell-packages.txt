@@ -1200,7 +1200,6 @@ mines
 minesweeper
 mkbndl
 mkcabal
-modsplit
 mohws
 monadius
 mp3decoder
@@ -1283,3 +1282,10 @@ haskell-rwlock
 haskell-dbf
 haskell-shapefile
 haskell-file-embed
+hums
+haskell-monoids
+hommage-ds
+yst
+haskell-binpack
+haskell-pop3-client
+haskell-xdg-basedir

@@ -1,4 +1,4 @@
-
+{-# LANGUAGE FlexibleInstances #-}
 -- | Construct reports about a set of packages in AUR
 --
 module Distribution.ArchLinux.Report where
@@ -22,10 +22,57 @@ import System.Directory
 import System.Environment
 import System.Exit
 import System.FilePath
-import Control.Concurrent
+import Control.Concurrent (forkIO)
+import Control.Concurrent.Chan.Strict
+import Control.Concurrent.MVar.Strict
 import qualified Control.OldException as C
 import System.IO
 import System.Process
+import System.Time
+import GHC.Conc (numCapabilities)
+import Text.Printf
+import Control.Parallel.Strategies
+
+import Distribution.Version
+
+instance NFData (IO a) where rnf x = ()
+
+instance NFData Version where rnf x = x `seq` ()
+instance NFData AURInfo where rnf x = x `seq` ()
+instance NFData AnnotatedPkgBuild where rnf x = x `seq` ()
+
+-- Parallel work queue
+parM tests f = do
+    let n = numCapabilities
+    chan <- newChan
+    ps   <- getChanContents chan -- results
+    work <- newMVar tests        -- where to take jobs from
+    forM_ [1..n] $ forkIO . thread work chan    -- how many threads to fork
+
+    -- wait on i threads to close
+    -- logging them as they go
+    let wait xs i acc
+            | i >= n     = return acc -- done
+            | otherwise = case xs of
+                    Nothing     : xs -> wait xs (i+1) acc
+                    Just (s,a)  : xs -> do a ; wait xs i     (s : acc)
+    wait ps 0 []
+
+  where
+    -- thread :: MVar [Test] -> Chan (Maybe String) -> Int -> IO ()
+    thread work chan me = loop
+      where
+        loop = do
+            job <- modifyMVar work $ \jobs -> return $ case jobs of
+                        []     -> ([], Nothing)
+                        (j:js) -> (js, Just j)
+            case job of
+                Nothing   -> writeChan chan Nothing -- done
+                Just name -> do
+                    v <- f name
+                    writeChan chan . Just $ (v, printf "%d: %-25s\n" me name)
+                    loop
+
 
 -- | Take as input a list of package names, return a pandoc object
 -- reporting on interesting facts about the packages.
@@ -33,10 +80,10 @@ import System.Process
 report :: [String] -> IO String
 report xs = do
     -- collect sets of results
-    res_ <- forM xs $ \p -> do
+    res_ <- parM (nub xs) $ \p -> do
         handle (\s -> return (p, Nothing, (Left (show s), Left []))) $ do
-            putStrLn $ "Retrieving " ++ p
             k <- package p
+            k `seq` return ()
 
             -- if there is a hackage path, lookup version.
             --  cabal info xmonad -v0
@@ -60,7 +107,9 @@ report xs = do
 
             return (p, vers, k)
 
-    let results = sortBy (\(n,_,_) (m,_,_) -> n `compare` m) res_
+    time <- getClockTime
+
+    let results = sortBy (\(n,x,_) (m,y,_) -> x `seq` y `seq` n `compare` m) res_
 
     return. showHtml $
         (header $
@@ -72,7 +121,12 @@ report xs = do
         (body $
             center ((h2 (toHtml "Arch Haskell Package Status")))
             +++
-
+            (table $
+                (tr (td (toHtml $ "Results from " ++ show time)))
+                +++
+                (tr (td (toHtml $ "Found  " ++ show (length results) ++ " packages" )))
+            )
+            +++
             (scores . table $
                 tr (concatHtml
                       [ td . categoryTag . toHtml $ "Package"

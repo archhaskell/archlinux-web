@@ -1,5 +1,8 @@
 import Distribution.ArchLinux.Report
 
+-- $ time ./arch-report +RTS -N4
+-- compiled with -threaded.
+
 main = do
     s <- lines `fmap` readFile "arch-haskell-packages.txt"
     writeFile "/tmp/x.html" =<< report s
