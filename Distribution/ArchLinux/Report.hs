@@ -1,7 +1,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 -- | Construct reports about a set of packages in AUR
 --
-module Distribution.ArchLinux.Report where
+module Distribution.ArchLinux.Report (
+    report , loadPackageIndex
+    ) where
 
 import Distribution.ArchLinux.AUR
 import Distribution.ArchLinux.PkgBuild
@@ -42,7 +44,8 @@ instance NFData Version where rnf x = x `seq` ()
 instance NFData AURInfo where rnf x = x `seq` ()
 instance NFData AnnotatedPkgBuild where rnf x = x `seq` ()
 
--- Parallel work queue
+-- Parallel work queue, similar to forM
+--
 parM tests f = do
     let n = numCapabilities
     chan <- newChan
@@ -75,8 +78,8 @@ parM tests f = do
                     loop
 
 
--- | Take as input a list of package names, return a pandoc object
--- reporting on interesting facts about the packages.
+-- | Take as input a list of package names, return an html page
+-- with interesting facts about the state of the packages.
 --
 report :: [String] -> IO String
 report xs = do
@@ -184,6 +187,7 @@ report xs = do
                           ]
 
                         -- Found everything
+                        -- TODO parallelise this and remove redundancies
                          Right pkg ->
                           [ td . toHtml $
                               hotlink
@@ -235,11 +239,6 @@ report xs = do
                 )
             )
 
-
-    {-
-    (Right (AURInfo {packageID = 17480, packageName = "haskell-json", packageVersion = Right (Version {versionBranch = [0,4,3], versionTags = []},"1"), packageCategory = 10, packageDesc = "Support for serialising Haskell to and from JSON", packageLocation = 2, packageURL = "http://hackage.haskell.org/cgi-bin/hackage-scripts/package/json", packagePath = "/packages/haskell-json/haskell-json.tar.gz", packageLicense = "custom:BSD3", packageVotes = 16, packageOutOfDate = False}),Right (AnnotatedPkgBuild {pkgBuiltWith = Just (Version {versionBranch = [0,5,3], versionTags = []}), pkgHeader = "# Contributor: Arch Haskell Team <arch-haskell@haskell.org>", pkgBody = PkgBuild {arch_pkgname = "haskell-json", arch_pkgver = Version {versionBranch = [0,4,3], versionTags = []}, arch_pkgrel = 1, arch_pkgdesc = "\"Support for serialising Haskell to and from JSON\"", arch_arch = ArchList [Arch_X86,Arch_X86_64], arch_url = "\"http://hackage.haskell.org/cgi-bin/hackage-scripts/package/json\"", arch_license = ArchList [BSD3], arch_makedepends = ArchList [], arch_depends = ArchList [], arch_source = ArchList [], arch_md5sum = ArchList [], arch_build = [], arch_install = Nothing, arch_options = ArchList []}}))
-    -}
-
 categoryTag  x = thediv x ! [identifier "Category"    ]
 bad     x = thediv x ! [identifier "Bad"  ]
 good    x = thediv x ! [identifier "Best" ]
@@ -284,7 +283,7 @@ myReadProcess cmd args input = C.handle (return . handler) $ do
 
 ------------------------------------------------------------------------
 --
--- Load a table of packages and their latest versions
+-- | Load a table of packag names associated with their latest versions
 --
 loadPackageIndex :: IO (M.Map String Version)
 loadPackageIndex = do
