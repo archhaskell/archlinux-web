@@ -150,6 +150,12 @@ report xs = do
                        Left  err ->
                           [ td $ toHtml p
                           , td $ bad (toHtml "No AUR entry found!")
+                          , td $ toHtml ""
+                          , td $ toHtml ""
+                          , td $ toHtml ""
+                          , td $ toHtml ""
+                          , td $ toHtml ""
+                          , td $ toHtml ""
                           ]
 
                        Right aur -> case pkg_ of

@@ -183,7 +183,6 @@ haskell-chalkboard-viewer
 haskell-chalmers-lava2000
 haskell-chart
 haskell-chasingbottoms
-haskell-cheatsheet
 haskell-checked
 haskell-checkers
 haskell-chp
@@ -240,7 +239,6 @@ haskell-data-accessor-mtl
 haskell-data-accessor-template
 haskell-data-accessor-transformers
 haskell-data-binary-ieee754
-haskell-data-cordering
 haskell-data-default
 haskell-data-hash
 haskell-data-ivar
@@ -249,9 +247,6 @@ haskell-data-ordlist
 haskell-data-quotientref
 haskell-data-reify
 haskell-data-spacepart
-haskell-data-tree-avl
-haskell-data-trie-general
-haskell-data-trie-general-ordgt
 haskell-dataenc
 haskell-datetime
 haskell-dbus
@@ -265,7 +260,6 @@ haskell-delicious
 haskell-delimited-text
 haskell-denominate
 haskell-dequeue
-haskell-derive
 haskell-derive-gadt
 haskell-diagrams
 haskell-diff
@@ -296,7 +290,6 @@ haskell-email-validate
 haskell-emgm
 haskell-encode
 haskell-encoding
-haskell-enumsets
 haskell-erf
 haskell-errno
 haskell-esotericbot
@@ -364,7 +357,6 @@ haskell-ghc-mtl
 haskell-ghc-paths
 haskell-ghc-syb
 haskell-ghood
-haskell-gitit
 haskell-glfw
 haskell-glfw-ogl
 haskell-glob
@@ -1296,3 +1288,14 @@ haskell-enummap
 haskell-cabal-query
 haskell-pubsub
 haskell-hommage-ds
+haskell-dyre
+haskell-ac-vanillaarray
+haskell-list-grouping
+haskell-monadcatchio-transformers
+hp2any-core
+hp2any-graph
+haskell-hp2any-manager
+haskell-triemap
+haskell-tagged
+haskell-enumerable
+haskell-compose-trans
