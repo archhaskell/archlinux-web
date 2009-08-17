@@ -38,6 +38,9 @@ import Control.Parallel.Strategies
 import Distribution.Version
 import qualified Data.Map as M
 
+import Text.CSV
+import Network.HTTP
+
 instance NFData (IO a) where rnf x = ()
 
 instance NFData Version where rnf x = x `seq` ()
@@ -85,7 +88,8 @@ report :: [String] -> IO String
 report xs = do
     -- load current index.
     putStr "Loading package index ... " >> hFlush stdout
-    index <- loadPackageIndex
+    index     <- loadPackageIndex
+    downloads <- loadHackageDownloads
     putStrLn "Done."
 
     -- collect sets of results
@@ -111,6 +115,7 @@ report xs = do
     return. showHtml $
         (header $
             (thetitle (toHtml "Arch Haskell Package Report")) +++
+            (script ! [src  "http://galois.com/~dons/sorttable.js"]) (toHtml "") +++
             ((thelink noHtml) ! [ rel "stylesheet"
                                 , href "http://galois.com/~dons/arch-haskell.css"
                                 , thetype "text/css" ])) +++
@@ -124,15 +129,16 @@ report xs = do
                 (tr (td (toHtml $ "Found  " ++ show (length results) ++ " packages" )))
             )
             +++
-            (scores . table $
+            (scores . sortable . table $
                 tr (concatHtml
-                      [ td . categoryTag . toHtml $ "Package"
-                      , td . categoryTag . toHtml $ "Hackage"
-                      , td . categoryTag . toHtml $ "Version"
-                      , td . categoryTag . toHtml $ "Latest"
-                      , td . categoryTag . toHtml $ "cabal2arch"
-                      , td . categoryTag . toHtml $ "Votes"
-                      , td . categoryTag . toHtml $ "Description"
+                      [ th . categoryTag . toHtml $ "Package"
+                      , th . categoryTag . toHtml $ "Hackage"
+                      , th . categoryTag . toHtml $ "Version"
+                      , th . categoryTag . toHtml $ "Latest"
+                      , th . categoryTag . toHtml $ "cabal2arch"
+                      , th . categoryTag . toHtml $ "Votes"
+                      , th . categoryTag . toHtml $ "Downloads"
+                      , th . categoryTag . toHtml $ "Description"
                       ]) +++
 
                 concatHtml
@@ -176,12 +182,17 @@ report xs = do
                                                  | otherwise -> bad (toHtml (display v))
 
                           , td $ if packageLocation aur /= 3
-                                    then bad (toHtml "PKGBUILD not found")
+                                    then bad (toHtml "Not Found")
                                     else toHtml ""
 
                           , td  $ if packageVotes aur > 10
                                      then good $ toHtml $ show $ packageVotes aur
                                      else        toHtml $ show $ packageVotes aur
+
+                          , td  $ case M.lookup (let n = takeFileName (packageURL aur) in if null n then packageName aur else n) downloads of
+                                    Nothing -> toHtml ""
+                                    Just n | n >= 1000 -> good (toHtml (show n))
+                                           | otherwise -> (toHtml (show n))
 
                           , td $ toHtml $ packageDesc aur
                           ]
@@ -230,6 +241,12 @@ report xs = do
                                      then good $ toHtml $ show $ packageVotes aur
                                      else        toHtml $ show $ packageVotes aur
 
+                                -- bug in computing real Haskell name.
+                          , td  $ case M.lookup (let n = takeFileName (packageURL aur) in if null n then packageName aur else n) downloads of
+                                    Nothing -> toHtml ""
+                                    Just n | n >= 1000 -> good (toHtml (show n))
+                                           | otherwise -> (toHtml (show n))
+
                           , td  $ toHtml $ packageDesc aur
 
                           ]
@@ -243,6 +260,8 @@ categoryTag  x = thediv x ! [identifier "Category"    ]
 bad     x = thediv x ! [identifier "Bad"  ]
 good    x = thediv x ! [identifier "Best" ]
 scores  x = thediv x ! [identifier "Scores" ]
+
+sortable x = x ! [theclass "sortable"]
 
 
 ------------------------------------------------------------------------
@@ -305,5 +324,22 @@ loadPackageIndex = do
             -- Data.Map String Version
             --
 
+url :: String
+url = "http://www.galois.com/~dons/hackage/august-2009/hackage-downloads-august-2009.csv"
 
-
+loadHackageDownloads :: IO (M.Map String Integer)
+loadHackageDownloads = do
+    rsp <- simpleHTTP (getRequest url)
+    case rsp of
+         Left err -> error "Unable to get Hackage data"
+         Right _  -> do
+            idx <- getResponseBody rsp -- TODO 404
+            case parseCSV "hackage.csv" idx of
+                 Left err  -> error (show err)
+                 Right cvs -> do
+                    let
+                        table = M.fromList  -- last value is used. cabal prints in version order.
+                                    [ (head row
+                                      ,read (last row))
+                                    | row <- init (tail cvs) ]
+                    return $! table
