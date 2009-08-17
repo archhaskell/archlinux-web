@@ -1285,7 +1285,6 @@ haskell-shapefile
 haskell-file-embed
 hums
 haskell-monoids
-hommage-ds
 yst
 haskell-binpack
 haskell-pop3-client
@@ -1296,3 +1295,4 @@ haskell-network-fancy
 haskell-enummap
 haskell-cabal-query
 haskell-pubsub
+haskell-hommage-ds
