@@ -90,6 +90,7 @@ report xs = do
     putStr "Loading package index ... " >> hFlush stdout
     index     <- loadPackageIndex
     downloads <- loadHackageDownloads
+    builds    <- loadBuildStatus
     putStrLn "Done."
 
     -- collect sets of results
@@ -148,7 +149,7 @@ report xs = do
                      tr $ concatHtml $
                       case aur_ of
                        Left  err ->
-                          [ td $ toHtml p
+                          [ td $ (maybe id (\n -> if n then good else bad) (M.lookup p builds)) ( toHtml p )
                           , td $ bad (toHtml "No AUR entry found!")
                           , td $ toHtml ""
                           , td $ toHtml ""
@@ -165,7 +166,8 @@ report xs = do
                           [ td . toHtml $
                               hotlink
                                 (packageURLinAUR aur)
-                                (toHtml p)
+                                ((maybe id (\n -> if n then good else bad)
+                                    (M.lookup p builds)) (toHtml p))
 
                           , td .
                               (if null (packageURL aur) then bad else id) . toHtml $
@@ -209,7 +211,8 @@ report xs = do
                           [ td . toHtml $
                               hotlink
                                 (packageURLinAUR aur)
-                                (toHtml p)
+                                ((maybe id (\n -> if n then good else bad)
+                                    (M.lookup p builds)) (toHtml p))
 
                           , td .
                               (if null (packageURL aur) then bad else id) . toHtml $
@@ -330,6 +333,8 @@ loadPackageIndex = do
             -- Data.Map String Version
             --
 
+------------------------------------------------------------------------
+
 url :: String
 url = "http://www.galois.com/~dons/hackage/august-2009/hackage-downloads-august-2009.csv"
 
@@ -349,3 +354,17 @@ loadHackageDownloads = do
                                       ,read (last row))
                                     | row <- init (tail cvs) ]
                     return $! table
+
+filepath :: FilePath
+filepath = "/home/dons/.build-all.log"
+
+loadBuildStatus :: IO (M.Map String Bool)
+loadBuildStatus = do
+    s <- readFile filepath
+    let table = M.fromList
+                    [ (n, read k)
+                    | l <- lines s
+                    , let [n, k] = words l
+                    ]
+
+    return $! table
