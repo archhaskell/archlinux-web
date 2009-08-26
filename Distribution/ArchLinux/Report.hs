@@ -325,7 +325,9 @@ loadPackageIndex = do
                      [  (name, vers)
                      |  pkg <- lines idx
                      ,  let (name, _:vers_) = break isSpace pkg
-                     ,  let vers = fromJust (simpleParse vers_)
+                     ,  let vers = (case (simpleParse vers_) of
+                                        Nothing -> error "simpleParse failed"
+                                        Just n  -> n)
                      ]
 
             return $! table

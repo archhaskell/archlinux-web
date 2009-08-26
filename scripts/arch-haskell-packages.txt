@@ -1,13 +1,3 @@
-xmonad
-haskell-utf8-string
-haskell-x11
-gtk2hs
-haskell-http
-haskell-x11-xft
-haskell-zlib
-alex
-pandoc
-darcs
 addlicenseinfo
 agda-executable
 armada
@@ -35,7 +25,6 @@ conjure
 cpbrainfuck
 cpphs
 curry-frontend
-darcs
 darcs-beta
 darcs-graph
 darcs-monitor
@@ -302,7 +291,6 @@ haskell-executable-path
 haskell-exif
 haskell-explicit-exception
 haskell-explicit-sharing
-haskell-extensible-exceptions
 haskell-external-sort
 haskell-extra
 haskell-fad
@@ -432,9 +420,7 @@ haskell-happstack-util
 haskell-harm
 haskell-harp
 haskell-harpy
-haskell-hashed-storage
 haskell-hasim
-haskell-haskeline
 haskell-haskeline-class
 haskell-haskell-lexer
 haskell-haskell-src
@@ -706,7 +692,6 @@ haskell-miniplex
 haskell-missingh
 haskell-missingpy
 haskell-mlist
-haskell-mmap
 haskell-mmtl
 haskell-modsplit
 haskell-mohws
@@ -1007,7 +992,6 @@ haskell-tcp
 haskell-template
 haskell-template-haskell
 haskell-tensor
-haskell-terminfo
 haskell-ternarytrees
 haskell-terrahs
 haskell-test-framework
@@ -1316,3 +1300,8 @@ haskell-parsimony
 haskell-x11-xdamage
 haskell-x11-xshape
 graphtype
+astrds
+haskell-moe
+haskell-epoll
+haskell-hoauth
+haskell-named-lock
