@@ -485,7 +485,6 @@ haskell-hipmunk
 haskell-hjavascript
 haskell-hjs
 haskell-hjscript
-haskell-hledger
 haskell-hlibev
 haskell-hlist
 haskell-hlongurl
@@ -1026,6 +1025,7 @@ haskell-tuple
 haskell-tv
 haskell-type
 haskell-type-equality-check
+haskell-type-equality
 haskell-type-level
 haskell-typecompose
 haskell-typehash
@@ -1305,3 +1305,9 @@ haskell-moe
 haskell-epoll
 haskell-hoauth
 haskell-named-lock
+haskell-hsmtpclient
+haskell-scion
+haskell-jail
+haskell-union-find
+haskell-agum
+haskell-colorize-haskell

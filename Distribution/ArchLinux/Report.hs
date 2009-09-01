@@ -54,7 +54,7 @@ parM tests f = do
     chan <- newChan
     ps   <- getChanContents chan -- results
     work <- newMVar tests        -- where to take jobs from
-    forM_ [1..n] $ forkIO . thread work chan    -- how many threads to fork
+    forM_ [1..(n*64)] $ forkIO . thread work chan    -- how many threads to fork
 
     -- wait on i threads to close
     -- logging them as they go
@@ -338,7 +338,7 @@ loadPackageIndex = do
 ------------------------------------------------------------------------
 
 url :: String
-url = "http://www.galois.com/~dons/hackage/august-2009/hackage-downloads-august-2009.csv"
+url = "http://www.galois.com/~dons/hackage/hackage-downloads.csv"
 
 loadHackageDownloads :: IO (M.Map String Integer)
 loadHackageDownloads = do
