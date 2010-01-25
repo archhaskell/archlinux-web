@@ -17,6 +17,8 @@ import Control.Concurrent.Chan
 import Control.Concurrent.MVar
 import Control.Parallel.Strategies
 
+k = 32
+
 -- Parallel work queue, similar to forM
 --
 parM tests f = do
@@ -24,12 +26,12 @@ parM tests f = do
     chan <- newChan
     ps   <- getChanContents chan -- results
     work <- newMVar tests        -- where to take jobs from
-    forM_ [1..n*256] $ forkIO . thread work chan    -- how many threads to fork
+    forM_ [1..n*k] $ forkIO . thread work chan    -- how many threads to fork
 
     -- wait on i threads to close
     -- logging them as they go
     let wait xs i acc
-            | i >= n     = return acc -- done
+            | i >= (n*k)     = return acc -- done
             | otherwise = case xs of
                     Nothing     : xs -> wait xs (i+1) acc
                     Just (s,a)  : xs -> do a ; wait xs i     (s : acc)
@@ -95,8 +97,8 @@ main = do
 
 -- hand search
 community =
-    [ ("xmonad", "0.8.1", Just "http://www.archlinux.org/packages/community/i686/xmonad/")
-    , ("X11", "1.4.5", Just "http://www.archlinux.org/packages/community/i686/haskell-x11/")
+    [ ("xmonad", "0.9", Just "http://www.archlinux.org/packages/community/i686/xmonad/")
+    , ("X11", "1.4.6.1", Just "http://www.archlinux.org/packages/community/i686/haskell-x11/")
     , ("X11-xft", "0.3", Just "http://www.archlinux.org/packages/community/i686/haskell-x11-xft/")
     , ("utf8-string","0.3.5", Just "http://www.archlinux.org/packages/extra/i686/haskell-utf8-string/")
     , ("haskeline", "0.6.1", Just "http://www.archlinux.org/packages/extra/i686/haskell-haskeline/")
