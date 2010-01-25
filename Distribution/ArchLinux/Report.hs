@@ -54,12 +54,13 @@ parM tests f = do
     chan <- newChan
     ps   <- getChanContents chan -- results
     work <- newMVar tests        -- where to take jobs from
-    forM_ [1..(n*64)] $ forkIO . thread work chan    -- how many threads to fork
+    let m = n * 64
+    forM_ [1..m] $ forkIO . thread work chan    -- how many threads to fork
 
     -- wait on i threads to close
     -- logging them as they go
     let wait xs i acc
-            | i >= n     = return acc -- done
+            | i >= m     = return acc -- done
             | otherwise = case xs of
                     Nothing     : xs -> wait xs (i+1) acc
                     Just (s,a)  : xs -> do a ; wait xs i     (s : acc)
