@@ -10,6 +10,7 @@ module Distribution.ArchLinux.AUR (
         AURInfo(..),
         info,
         search,
+        maintainer,
         package
 
     ) where
@@ -73,6 +74,14 @@ search m = do
     return $ case v of
         Left  e -> []
         Right a -> flatten a
+
+-- | Search AUR for packages owned by maintainer. Returns a list of info results.
+maintainer :: String -> IO [AURInfo]
+maintainer m = do
+    v <- eval (MaintainerRequest (Name m))
+    return $ case v of
+        Left  e -> []
+        Right a -> maintainerPackages a
 
 ------------------------------------------------------------------------
 --
@@ -152,13 +161,15 @@ eval m = do
 -- | Type for AUR RPC requests. They can be info queries, or search queries.
 --
 data AURRequest
-    = SearchRequest Name
-    | InfoRequest   Name
+    = SearchRequest     Name
+    | MaintainerRequest Name
+    | InfoRequest       Name
     deriving Show
 
 instance Pretty AURRequest where
     pPrint (SearchRequest n) = text "type" <=> text "search" <&> text "arg" <=> pPrint n
     pPrint (InfoRequest   n) = text "type" <=> text "info"   <&> text "arg" <=> pPrint n
+    pPrint (MaintainerRequest n) = text "type" <=> text "msearch" <&> text "arg" <=> pPrint n
 
 -- | Wrap up a package name a bit safely.
 newtype Name = Name String
@@ -179,6 +190,32 @@ p <?> q = p <> char '?' <> q
 -- RPC response values
 
 -- We can in turn use this info to query PKGBUILDs on the server
+
+-- | A type for maintainer search.
+data AURMaintainer = AURMaintainer { maintainerPackages :: [AURInfo] } deriving Show
+
+instance JSON AURMaintainer where
+    showJSON = undefined
+
+    readJSON (JSObject o) = do
+            -- sanity check:
+            case M.lookup "type" json of
+                Just (JSString t) | fromJSString t == "msearch" -> do
+                    as <- forM results $ \(JSObject o) -> do
+                                let obj = M.fromList (fromJSObject o) :: M.Map String JSValue
+                                parseInfo obj
+
+                    return (AURMaintainer as)
+
+                s -> fail $ "No type field in JSON response!" ++ show s
+
+        where
+            json     = M.fromList (fromJSObject o) :: M.Map String JSValue
+            results  = case M.lookup "results" json of
+                            Nothing           -> error $ "No results for info object"
+                            Just (JSArray a)  -> a -- a list.
+
+------------------------------------------------------------------------
 
 -- | Type for AUR RPC responses.
 data AURInfo
