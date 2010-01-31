@@ -447,6 +447,7 @@ haskell-glfw
 haskell-glfw-b
 haskell-glfw-ogl
 haskell-glob
+haskell-glome-hs
 haskell-glometrace
 haskell-glomevec
 haskell-gluraw
@@ -594,6 +595,7 @@ haskell-hjavascript
 haskell-hjs
 haskell-hjscript
 haskell-hlibev
+haskell-hlint
 haskell-hlist
 haskell-hlongurl
 haskell-hmarkup
@@ -968,6 +970,7 @@ haskell-persistent-map
 haskell-pgm
 haskell-phonetic-code
 haskell-pipe
+haskell-pisigma
 haskell-pkcs1
 haskell-platform
 haskell-plist
@@ -1362,7 +1365,6 @@ hbeat
 hburg
 hcc
 helisp
-helium
 hetris
 hevolisa
 hevolisa-dph
@@ -1439,7 +1441,6 @@ mpdmate
 multiplicity
 nehe-tuts
 ngrams
-nhc98
 nikepub
 nymphaea
 omnicodec
@@ -1467,6 +1468,7 @@ pxsl-tools
 quickcheck-script
 randsolid
 ranka
+rbr
 riot
 roguestar-engine
 roguestar-gl
@@ -1511,9 +1513,11 @@ urlcheck
 uuagc
 vintage-basic
 wavconvert
+wol
 wp-archivebot
 wxasteroids
 xml2x
+xsact
 yampasynth
 yeganesh
 yi

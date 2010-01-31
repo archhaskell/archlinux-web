@@ -327,7 +327,7 @@ loadPackageIndex = do
                      |  pkg <- lines idx
                      ,  let (name, _:vers_) = break isSpace pkg
                      ,  let vers = (case (simpleParse vers_) of
-                                        Nothing -> error "simpleParse failed"
+                                        Nothing -> fromJust (simpleParse "0.0")
                                         Just n  -> n)
                      ]
 
@@ -337,6 +337,9 @@ loadPackageIndex = do
             --
 
 ------------------------------------------------------------------------
+--
+-- Todo : update
+--
 
 url :: String
 url = "http://www.galois.com/~dons/hackage/hackage-downloads.csv"
@@ -359,7 +362,7 @@ loadHackageDownloads = do
                     return $! table
 
 filepath :: FilePath
-filepath = "/home/dons/.build-all.log"
+filepath = ".build-all.log"
 
 loadBuildStatus :: IO (M.Map String Bool)
 loadBuildStatus = do
