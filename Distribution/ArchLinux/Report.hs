@@ -9,6 +9,7 @@ import Distribution.ArchLinux.AUR
 import Distribution.ArchLinux.PkgBuild
 
 import Distribution.Text
+import Control.DeepSeq
 
 import System.FilePath
 import Data.Maybe
