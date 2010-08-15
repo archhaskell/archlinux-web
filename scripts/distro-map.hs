@@ -18,6 +18,11 @@ import Control.Concurrent.Chan
 import Control.Concurrent.MVar
 import Control.Parallel.Strategies
 
+
+{-
+Generate the report of mappings of hackage to distro urls for Hackage
+-}
+
 k = 32
 
 -- Parallel work queue, similar to forM

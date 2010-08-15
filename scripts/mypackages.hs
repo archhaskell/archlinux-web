@@ -1,6 +1,10 @@
 import Distribution.ArchLinux.AUR
 import Control.Monad
 
+--
+-- packages maintained by arch-haskell
+--
+
 me = "arch-haskell"
 
 main = do

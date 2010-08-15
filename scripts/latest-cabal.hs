@@ -6,6 +6,8 @@ import System.FilePath
 import Control.Monad
 import System.Cmd
 
+-- find the latest cabal version for a package.
+
 import Distribution.Text
 
 main = do
