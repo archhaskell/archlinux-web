@@ -10,6 +10,7 @@ import Distribution.Version
 
 import System.Directory
 import Text.Printf
+import Control.DeepSeq
 
 import GHC.Conc (numCapabilities)
 import Control.Concurrent
@@ -96,7 +97,7 @@ main = do
 
     writeChan out Nothing
 
-    putStrLn "scp cabalArchMap.txt galois.com:www/"
+    putStrLn "scp cabalArchMap.txt www.galois.com:www/"
 
 -- hand search:
 --
