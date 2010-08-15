@@ -6,5 +6,5 @@ import Distribution.ArchLinux.Report
 main = do
     s <- lines `fmap` readFile "arch-haskell-packages.txt"
     writeFile "/tmp/arch-haskell-status.html" =<< report s
-    putStrLn "Now: scp /tmp/arch-haskell-status.html galois.com:www/"
+    putStrLn "Now: scp /tmp/arch-haskell-status.html www.galois.com:www/"
 
