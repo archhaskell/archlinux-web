@@ -14,6 +14,7 @@ import Control.DeepSeq
 
 import GHC.Conc (numCapabilities)
 import Control.Concurrent
+import qualified Control.OldException as C
 import Control.Concurrent.Chan
 import Control.Concurrent.MVar
 import Control.Parallel.Strategies
@@ -66,7 +67,7 @@ writer ch = do
                        writer ch
 
 main = do
-    removeFile "cabalArchMap.txt"
+    C.handle (\e -> return ()) (removeFile "cabalArchMap.txt")
 
     -- todo: replace this with call to AUR json interface.
     s <- lines `fmap` readFile "arch-haskell-packages.txt"
