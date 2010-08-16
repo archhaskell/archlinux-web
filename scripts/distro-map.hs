@@ -5,6 +5,7 @@ import Distribution.ArchLinux.PkgBuild
 import System.FilePath
 import Control.Monad
 
+import Data.List
 import Distribution.Text
 import Distribution.Version
 
@@ -66,11 +67,15 @@ writer ch = do
          Just s  -> do appendFile "cabalArchMap.txt" s
                        writer ch
 
+me = "arch-haskell"
+
 main = do
     C.handle (\e -> return ()) (removeFile "cabalArchMap.txt")
 
     -- todo: replace this with call to AUR json interface.
-    s <- lines `fmap` readFile "arch-haskell-packages.txt"
+    -- s <- lines `fmap` readFile "arch-haskell-packages.txt"
+    packages <- maintainer me
+    let s = sort $ map packageName packages
 
     -- just write out the ones we already know.
     forM community $ \p@(name, vers, url) -> do
