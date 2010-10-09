@@ -131,7 +131,7 @@ community =
     , ("mtl", "1.1.0.2", Just "http://www.archlinux.org/packages/extra/i686/haskell-mtl/")
     , ("network", "2.2.1.7", Just "http://www.archlinux.org/packages/extra/i686/haskell-network/")
     , ("dataenc", "0.13.0.2", Just "http://www.archlinux.org/packages/extra/i686/haskell-dataenc/")
-    , ("hashed-storage",    "0.3.9",  Just  "http://www.archlinux.org/packages/extra/i686/haskell-hashed-storage/")
+    , ("hashed-storage",    "0.4.13",  Just  "http://www.archlinux.org/packages/extra/i686/haskell-hashed-storage/")
 
     , ("html",     "1.0.1.2", Just "http://www.archlinux.org/packages/extra/i686/haskell-html/")
     , ("mmap", "0.4.1", Just "http://www.archlinux.org/packages/extra/i686/haskell-mmap/")
