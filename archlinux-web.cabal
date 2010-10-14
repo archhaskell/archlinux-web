@@ -1,4 +1,4 @@
-name:           archlinux
+name:           archlinux-web
 version:        0.3.3
 license:        BSD3
 license-file:   LICENSE
@@ -6,8 +6,8 @@ author:         Don Stewart <dons@galois.com>
 maintainer:     Don Stewart <dons@galois.com>
 homepage:       http://code.haskell.org/~dons/code/archlinux
 category:       Distribution
-synopsis:       Support for working with Arch Linux packages
-description:    Support for working with Arch Linux packages
+synopsis:       Website maintenance for Arch Linux packages
+description:    Website maintenance for Arch Linux packages
                 .
                 To get info about a package:
                 .
@@ -20,8 +20,8 @@ description:    Support for working with Arch Linux packages
                 To find packages owned by a maintainer:
                 .
                 > maintainer "arch-haskell"
-                . 
-                Generate an html page of interesting facts about 
+                .
+                Generate an html page of interesting facts about
                 packages in AUR and Hackage.
                 .
                 > report ["xmonad"]
@@ -49,11 +49,11 @@ library
                     deepseq,
                     strict-concurrency,
                     old-time,
-                    csv
+                    csv,
+                    archlinux
 
     exposed-modules:
         Distribution.ArchLinux.AUR
-        Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.Report
 
 executable arch-report
@@ -74,7 +74,8 @@ executable arch-report
         deepseq,
         strict-concurrency,
         old-time,
-        csv
+        csv,
+        archlinux
 
     other-modules:
         Distribution.ArchLinux.Report
@@ -98,11 +99,11 @@ executable distro-map
         deepseq,
         strict-concurrency,
         old-time,
-        csv
+        csv,
+        archlinux
 
     other-modules:
         Distribution.ArchLinux.AUR
-        Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.Report
 
 executable get-arch-url
@@ -116,14 +117,10 @@ executable get-arch-url
         prettyclass,
         containers,
         filepath,
-        xhtml,
         process,
         directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
+        csv,
+        archlinux
 
     other-modules:
         Distribution.ArchLinux.AUR
@@ -139,19 +136,15 @@ executable arch-haskell-packages
         prettyclass,
         containers,
         filepath,
-        xhtml,
         process,
         directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
+        csv,
+        archlinux
 
     other-modules:
         Distribution.ArchLinux.AUR
 
-executable update-aur-log 
+executable update-aur-log
     main-is: scripts/update-aur-log.hs
     build-depends:
         base >= 4 && < 6
