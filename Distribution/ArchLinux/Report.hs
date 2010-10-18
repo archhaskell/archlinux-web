@@ -7,6 +7,7 @@ module Distribution.ArchLinux.Report (
 
 import Distribution.ArchLinux.AUR
 import Distribution.ArchLinux.PkgBuild
+import Distribution.ArchLinux.CabalTranslation (oldCabal2Arch)
 
 import Distribution.Text
 import Control.DeepSeq
