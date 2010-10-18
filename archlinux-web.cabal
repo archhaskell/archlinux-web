@@ -1,5 +1,5 @@
 name:           archlinux-web
-version:        0.3.3
+version:        0.1
 license:        BSD3
 license-file:   LICENSE
 author:         Don Stewart <dons@galois.com>
