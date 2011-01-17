@@ -108,7 +108,8 @@ main = do
 
     writeChan out Nothing
 
-    putStrLn "scp cabalArchMap.txt www.galois.com:www/"
+    putStrLn "copy the map to http://code.haskell.org/arch/cabalArchMap.txt:"
+    putStrLn "scp cabalArchMap.txt community.haskell.org/srv/code/arch"
 
 -- hand search:
 --
